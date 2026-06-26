@@ -131,7 +131,7 @@ export function HeroScene() {
           const dist = Math.hypot(n.x - m.x, n.y - m.y);
           if (dist < 120) {
             const alpha = (1 - dist / 120) * 0.15;
-            ctx.strokeStyle = `rgba(0, 255, 65, ${alpha})`;
+            ctx.strokeStyle = `rgba(170, 85, 255, ${alpha})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(n.x, n.y);
@@ -143,7 +143,7 @@ export function HeroScene() {
 
       // Draw node dots
       for (const n of nodes) {
-        ctx.fillStyle = "rgba(0, 255, 65, 0.4)";
+        ctx.fillStyle = "rgba(170, 85, 255, 0.5)";
         ctx.beginPath();
         ctx.arc(n.x, n.y, 1.5, 0, Math.PI * 2);
         ctx.fill();
@@ -166,7 +166,7 @@ export function HeroScene() {
           const p1 = projected[idx];
           const p2 = projected[next];
           const alpha = Math.max(0, (p1.z + p2.z) / 4 + 0.3) * 0.5;
-          ctx.strokeStyle = `rgba(0, 255, 65, ${alpha})`;
+          ctx.strokeStyle = `rgba(170, 85, 255, ${alpha})`;
           ctx.lineWidth = 0.6;
           ctx.beginPath();
           ctx.moveTo(p1.sx, p1.sy);
@@ -179,7 +179,7 @@ export function HeroScene() {
             if (downIdx < projected.length) {
               const p3 = projected[downIdx];
               const alpha2 = Math.max(0, (p1.z + p3.z) / 4 + 0.3) * 0.4;
-              ctx.strokeStyle = `rgba(0, 200, 255, ${alpha2})`;
+              ctx.strokeStyle = `rgba(200, 100, 255, ${alpha2})`;
               ctx.lineWidth = 0.4;
               ctx.beginPath();
               ctx.moveTo(p1.sx, p1.sy);
@@ -192,8 +192,8 @@ export function HeroScene() {
 
       // Sphere glow
       const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 1.2);
-      grad.addColorStop(0, "rgba(0, 255, 65, 0.04)");
-      grad.addColorStop(0.6, "rgba(0, 255, 65, 0.02)");
+      grad.addColorStop(0, "rgba(170, 85, 255, 0.06)");
+      grad.addColorStop(0.6, "rgba(170, 85, 255, 0.03)");
       grad.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -220,7 +220,7 @@ export function HeroScene() {
         const sy = halfH + p.y;
         const scale = (p.z + 1.5) / 2.5;
 
-        ctx.fillStyle = `rgba(0, 255, 65, ${p.opacity * scale * 0.6})`;
+        ctx.fillStyle = `rgba(170, 85, 255, ${p.opacity * scale * 0.6})`;
         ctx.beginPath();
         ctx.arc(sx, sy, p.size * scale, 0, Math.PI * 2);
         ctx.fill();

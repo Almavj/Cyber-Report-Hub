@@ -117,32 +117,32 @@
   --popover-foreground: 210 40% 98%;
   --popover-border: 215 28% 17%;
 
-  /* Neon Green */
-  --primary: 135 100% 50%;
-  --primary-foreground: 222 47% 3%;
+  /* Neon Purple */
+  --primary: 270 100% 62%;
+  --primary-foreground: 0 0% 100%;
 
-  /* Cyber Cyan */
-  --secondary: 180 100% 40%;
-  --secondary-foreground: 222 47% 3%;
+  /* Violet */
+  --secondary: 285 80% 55%;
+  --secondary-foreground: 270 50% 5%;
 
-  --muted: 217 33% 10%;
-  --muted-foreground: 215 20% 65%;
+  --muted: 260 30% 10%;
+  --muted-foreground: 260 20% 65%;
 
-  --accent: 217 33% 10%;
+  --accent: 260 30% 10%;
   --accent-foreground: 210 40% 98%;
 
   /* Neon Red */
   --destructive: 0 100% 50%;
   --destructive-foreground: 210 40% 98%;
 
-  --input: 215 28% 17%;
-  --ring: 135 100% 50%;
+  --input: 260 28% 17%;
+  --ring: 270 100% 65%;
 
-  --chart-1: 135 100% 50%; /* Neon green */
-  --chart-2: 180 100% 40%; /* Cyan */
-  --chart-3: 0 100% 50%; /* Neon red */
+  --chart-1: 270 100% 65%; /* Neon purple */
+  --chart-2: 285 80% 55%; /* Violet */
+  --chart-3: 0 100% 50%;  /* Neon red */
   --chart-4: 45 100% 50%; /* Neon yellow */
-  --chart-5: 280 100% 60%; /* Purple */
+  --chart-5: 180 100% 50%; /* Cyan */
 
   --app-font-sans: "Space Grotesk", "Inter", sans-serif;
   --app-font-serif: Georgia, serif;
@@ -202,13 +202,13 @@
 }
 
 .glitch-text::before {
-  color: #0ff;
+  color: #bf00ff;
   z-index: -1;
   animation: glitch-anim 2s infinite linear alternate-reverse;
 }
 
 .glitch-text::after {
-  color: #f0f;
+  color: #7f00ff;
   z-index: -2;
   animation: glitch-anim 2.5s infinite linear alternate-reverse;
 }
@@ -223,8 +223,8 @@
 }
 
 .glow-green {
-  box-shadow: 0 0 10px rgba(0, 255, 65, 0.5), inset 0 0 5px rgba(0, 255, 65, 0.2);
-  border-color: rgba(0, 255, 65, 0.8);
+  box-shadow: 0 0 10px rgba(170, 85, 255, 0.6), inset 0 0 5px rgba(170, 85, 255, 0.25);
+  border-color: rgba(170, 85, 255, 0.9);
 }
 
 .glow-red {
