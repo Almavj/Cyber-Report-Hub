@@ -1,22 +1,28 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Bug Bounty Hub API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: writeups
+    description: Writeup operations
+  - name: reports
+    description: Report operations
+  - name: tags
+    description: Tag operations
+  - name: stats
+    description: Stats and dashboard operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +30,317 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /writeups:
+    get:
+      operationId: listWriteups
+      tags: [writeups]
+      summary: List all writeups
+      parameters:
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: severity
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: featured
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of writeups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Writeup"
+    post:
+      operationId: createWriteup
+      tags: [writeups]
+      summary: Create a writeup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WriteupInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Writeup"
+
+  /writeups/{id}:
+    get:
+      operationId: getWriteup
+      tags: [writeups]
+      summary: Get a writeup by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Writeup found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Writeup"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateWriteup
+      tags: [writeups]
+      summary: Update a writeup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WriteupUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Writeup"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteWriteup
+      tags: [writeups]
+      summary: Delete a writeup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /writeups/{id}/feature:
+    patch:
+      operationId: toggleWriteupFeature
+      tags: [writeups]
+      summary: Toggle featured status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Writeup"
+
+  /reports:
+    get:
+      operationId: listReports
+      tags: [reports]
+      summary: List all reports
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: severity
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Report"
+    post:
+      operationId: createReport
+      tags: [reports]
+      summary: Create a report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+
+  /reports/{id}:
+    get:
+      operationId: getReport
+      tags: [reports]
+      summary: Get a report by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Report found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateReport
+      tags: [reports]
+      summary: Update a report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteReport
+      tags: [reports]
+      summary: Delete a report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /tags:
+    get:
+      operationId: listTags
+      tags: [tags]
+      summary: List all tags
+      responses:
+        "200":
+          description: List of tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tag"
+    post:
+      operationId: createTag
+      tags: [tags]
+      summary: Create a tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tag"
+
+  /tags/{id}:
+    delete:
+      operationId: deleteTag
+      tags: [tags]
+      summary: Delete a tag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /stats/dashboard:
+    get:
+      operationId: getDashboardStats
+      tags: [stats]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /stats/recent:
+    get:
+      operationId: getRecentActivity
+      tags: [stats]
+      summary: Get recent activity feed
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +348,254 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    Writeup:
+      type: object
+      required: [id, title, slug, content, severity, platform, bountyAmount, tags, featured, publishedAt, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        slug:
+          type: string
+        summary:
+          type: ["string", "null"]
+        content:
+          type: string
+        severity:
+          type: string
+          enum: [critical, high, medium, low, info]
+        platform:
+          type: string
+        bountyAmount:
+          type: ["number", "null"]
+        cveId:
+          type: ["string", "null"]
+        tags:
+          type: array
+          items:
+            type: string
+        featured:
+          type: boolean
+        publishedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    WriteupInput:
+      type: object
+      required: [title, content, severity, platform]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        summary:
+          type: string
+        content:
+          type: string
+          minLength: 1
+        severity:
+          type: string
+          enum: [critical, high, medium, low, info]
+        platform:
+          type: string
+        bountyAmount:
+          type: number
+        cveId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        featured:
+          type: boolean
+        publishedAt:
+          type: string
+
+    WriteupUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        summary:
+          type: string
+        content:
+          type: string
+        severity:
+          type: string
+          enum: [critical, high, medium, low, info]
+        platform:
+          type: string
+        bountyAmount:
+          type: number
+        cveId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        featured:
+          type: boolean
+        publishedAt:
+          type: string
+
+    Report:
+      type: object
+      required: [id, title, target, vulnerability, severity, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        target:
+          type: string
+        vulnerability:
+          type: string
+        severity:
+          type: string
+          enum: [critical, high, medium, low, info]
+        status:
+          type: string
+          enum: [draft, submitted, triaged, resolved, duplicate, invalid]
+        reward:
+          type: ["number", "null"]
+        description:
+          type: ["string", "null"]
+        stepsToReproduce:
+          type: ["string", "null"]
+        impact:
+          type: ["string", "null"]
+        attachments:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    ReportInput:
+      type: object
+      required: [title, target, vulnerability, severity, status]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        target:
+          type: string
+        vulnerability:
+          type: string
+        severity:
+          type: string
+          enum: [critical, high, medium, low, info]
+        status:
+          type: string
+          enum: [draft, submitted, triaged, resolved, duplicate, invalid]
+        reward:
+          type: number
+        description:
+          type: string
+        stepsToReproduce:
+          type: string
+        impact:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: string
+
+    ReportUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        target:
+          type: string
+        vulnerability:
+          type: string
+        severity:
+          type: string
+          enum: [critical, high, medium, low, info]
+        status:
+          type: string
+          enum: [draft, submitted, triaged, resolved, duplicate, invalid]
+        reward:
+          type: number
+        description:
+          type: string
+        stepsToReproduce:
+          type: string
+        impact:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: string
+
+    Tag:
+      type: object
+      required: [id, name, color]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        color:
+          type: string
+
+    TagInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        color:
+          type: string
+
+    DashboardStats:
+      type: object
+      required: [totalWriteups, totalReports, totalBounty, criticalCount, highCount, mediumCount, lowCount, resolvedReports, activeReports, featuredWriteups]
+      properties:
+        totalWriteups:
+          type: integer
+        totalReports:
+          type: integer
+        totalBounty:
+          type: number
+        criticalCount:
+          type: integer
+        highCount:
+          type: integer
+        mediumCount:
+          type: integer
+        lowCount:
+          type: integer
+        resolvedReports:
+          type: integer
+        activeReports:
+          type: integer
+        featuredWriteups:
+          type: integer
+
+    ActivityItem:
+      type: object
+      required: [id, type, title, severity, createdAt]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [writeup, report]
+        title:
+          type: string
+        severity:
+          type: string
+        status:
+          type: ["string", "null"]
+        createdAt:
+          type: string

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Bug Bounty Hub"
+version = "1.0.0"
+id = "artifacts/bounty-hub"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22800
+
+[services.development]
+run = "pnpm --filter @workspace/bounty-hub run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/bounty-hub", "run", "build" ]
+publicDir = "artifacts/bounty-hub/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22800"
+BASE_PATH = "/"
