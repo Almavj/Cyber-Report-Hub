@@ -23,6 +23,8 @@ export * from './reportUpdateSeverity';
 export * from './reportUpdateStatus';
 export * from './tag';
 export * from './tagInput';
+export * from './uploadUrlRequest';
+export * from './uploadUrlResponse';
 export * from './writeup';
 export * from './writeupInput';
 export * from './writeupInputSeverity';

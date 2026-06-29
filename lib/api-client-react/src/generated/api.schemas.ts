@@ -65,6 +65,7 @@ export interface WriteupInput {
   tags?: string[];
   featured?: boolean;
   publishedAt?: string;
+  attachments?: string[];
 }
 
 export type WriteupUpdateSeverity = typeof WriteupUpdateSeverity[keyof typeof WriteupUpdateSeverity];
@@ -211,6 +212,17 @@ export interface Tag {
   id: number;
   name: string;
   color: string;
+}
+
+export interface UploadUrlRequest {
+  name: string;
+  size: number;
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
 }
 
 export interface TagInput {

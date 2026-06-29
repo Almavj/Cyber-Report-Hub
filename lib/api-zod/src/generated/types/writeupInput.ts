@@ -20,4 +20,5 @@ export interface WriteupInput {
   tags?: string[];
   featured?: boolean;
   publishedAt?: string;
+  attachments?: string[];
 }

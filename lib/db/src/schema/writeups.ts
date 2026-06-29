@@ -13,6 +13,7 @@ export const writeupsTable = pgTable("writeups", {
   bountyAmount: numeric("bounty_amount"),
   cveId: text("cve_id"),
   tags: json("tags").$type<string[]>().notNull().default([]),
+  attachments: json("attachments").$type<string[]>().notNull().default([]),
   featured: boolean("featured").notNull().default(false),
   publishedAt: timestamp("published_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),

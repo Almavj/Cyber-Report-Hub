@@ -7,6 +7,8 @@ servers:
   - url: /api
     description: Base API path
 tags:
+  - name: storage
+    description: Object storage operations
   - name: health
     description: Health operations
   - name: writeups
@@ -18,6 +20,25 @@ tags:
   - name: stats
     description: Stats and dashboard operations
 paths:
+  /storage/uploads/request-url:
+    post:
+      operationId: requestUploadUrl
+      tags: [storage]
+      summary: Request a presigned upload URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlRequest"
+      responses:
+        "200":
+          description: Presigned upload URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+
   /healthz:
     get:
       operationId: healthCheck
@@ -415,6 +436,10 @@ components:
           type: boolean
         publishedAt:
           type: string
+        attachments:
+          type: array
+          items:
+            type: string
 
     WriteupUpdate:
       type: object
@@ -545,6 +570,26 @@ components:
         name:
           type: string
         color:
+          type: string
+
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name:
+          type: string
+        size:
+          type: number
+        contentType:
+          type: string
+
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL:
+          type: string
+        objectPath:
           type: string
 
     TagInput:
