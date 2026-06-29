@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SeverityBadge } from "@/components/ui/severity-badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Calendar, Shield, DollarSign, Activity } from "lucide-react";
+import { Edit, Trash2, Calendar, DollarSign, Activity } from "lucide-react";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import {
@@ -102,7 +102,7 @@ export default function ReportDetail() {
           <SeverityBadge severity={report.severity} />
           
           <div className="flex items-center gap-1 text-primary">
-            <Shield className="w-4 h-4" />
+            <img src="/Alma101.png" alt="Target" className="w-4 h-4" />
             <span>{report.target}</span>
           </div>
 

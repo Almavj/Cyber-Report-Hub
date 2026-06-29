@@ -6,7 +6,7 @@ import { SeverityBadge } from "@/components/ui/severity-badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Link } from "wouter";
 import { format } from "date-fns";
-import { ChevronRight, Shield, Target, Award, TerminalSquare } from "lucide-react";
+import { ChevronRight, Target, Award, TerminalSquare } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Home() {
@@ -62,7 +62,7 @@ export default function Home() {
         <Card className="bg-background/50 backdrop-blur border-border/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium font-mono text-muted-foreground">RESOLVED REPORTS</CardTitle>
-            <Shield className="w-4 h-4 text-cyan-500" />
+            <img src="/Alma101.png" alt="Resolved Reports" className="w-4 h-4" />
           </CardHeader>
           <CardContent>
             {statsLoading ? <Skeleton className="h-8 w-16" /> : (

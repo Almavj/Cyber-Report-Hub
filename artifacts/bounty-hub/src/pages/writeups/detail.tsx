@@ -4,7 +4,7 @@ import { useRoute, useLocation, Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SeverityBadge } from "@/components/ui/severity-badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Star, Calendar, Shield, DollarSign, Tag } from "lucide-react";
+import { Edit, Trash2, Star, Calendar, DollarSign, Tag } from "lucide-react";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import {
@@ -123,7 +123,7 @@ export default function WriteupDetail() {
           <SeverityBadge severity={writeup.severity} />
           
           <div className="flex items-center gap-1">
-            <Shield className="w-4 h-4 text-primary" />
+            <img src="/Alma101.png" alt="Platform" className="w-4 h-4" />
             <span>{writeup.platform}</span>
           </div>
           
