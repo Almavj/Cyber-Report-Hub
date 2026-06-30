@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: cyber-report-hub
+    name: 0x41m4
     runtime: node
     plan: starter
     buildCommand: |
@@ -20,7 +20,7 @@ services:
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
       - key: SUPABASE_STORAGE_BUCKET
-        value: cyber-report-hub
+        value: 0x41m4
       - key: ALLOWED_ORIGINS
         sync: false
     healthCheckPath: /api/healthz

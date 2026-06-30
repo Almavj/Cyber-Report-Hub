@@ -60,7 +60,7 @@ if (existsSync(frontendDist)) {
   });
 } else {
   app.get("/", (_req, res) => {
-    res.json({ status: "ok", service: "cyber-report-hub-api", endpoint: "/api" });
+    res.json({ status: "ok", service: "0x41m4-api", endpoint: "/api" });
   });
 }
 

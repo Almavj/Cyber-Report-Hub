@@ -1,6 +1,6 @@
-# [Project name]
+# 0x41M4
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Security research, vulnerability disclosures, and penetration testing writeups.
 
 ## Run & Operate
 

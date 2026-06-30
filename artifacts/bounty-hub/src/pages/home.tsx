@@ -25,15 +25,15 @@ export default function Home() {
         <div className="relative z-10 max-w-3xl mx-auto space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 text-sm text-primary border border-primary/30 bg-primary/10 glow-green mb-4">
             <TerminalSquare className="w-4 h-4" />
-            <span>ACCESS GRANTED: LEVEL 9 CLEARANCE</span>
+            <span>CNSP CERTIFIED · KENYA</span>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold font-mono tracking-tighter text-foreground glitch-text" data-text="ELITE THREAT INTEL">
-            ELITE THREAT INTEL
+          <h1 className="text-5xl md:text-7xl font-bold font-mono tracking-tighter text-foreground glitch-text" data-text="SECURITY RESEARCH &amp; DISCLOSURE LOG">
+            SECURITY RESEARCH &amp; DISCLOSURE LOG
           </h1>
           
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto border-l-2 border-primary/50 pl-4 text-left">
-            Security research, vulnerability disclosures, and critical writeups from the edge of the internet.
+            Security research, vulnerability disclosures, and penetration testing writeups.
           </p>
           
           <div className="flex flex-wrap items-center justify-center gap-4 pt-8">

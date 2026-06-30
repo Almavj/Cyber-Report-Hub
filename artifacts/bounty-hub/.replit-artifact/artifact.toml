@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Bug Bounty Hub"
+title = "0x41M4"
 version = "1.0.0"
 id = "artifacts/bounty-hub"
 router = "path"

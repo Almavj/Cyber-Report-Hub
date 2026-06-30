@@ -16,10 +16,10 @@ export function Navbar() {
       <div className="container mx-auto flex h-16 items-center px-4">
         <Link href="/" className="mr-8 flex items-center gap-2 transition-opacity hover:opacity-80">
           <div className="flex h-8 w-8 items-center justify-center border border-primary bg-primary/10 glow-green">
-            <img src="/Alma101.png" alt="BB_HUB Logo" className="h-5 w-5" />
+            <img src="/Alma101.png" alt="0x41M4 Logo" className="h-5 w-5" />
           </div>
-          <span className="font-mono text-xl font-bold tracking-tighter text-primary glitch-text" data-text="BB_HUB">
-            BB_HUB
+          <span className="font-mono text-xl font-bold tracking-tighter text-primary glitch-text" data-text="0x41M4">
+            0x41M4
           </span>
         </Link>
         <div className="flex items-center gap-6">

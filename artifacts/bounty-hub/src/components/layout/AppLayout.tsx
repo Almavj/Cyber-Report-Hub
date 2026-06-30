@@ -18,7 +18,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <footer className="border-t border-border/50 bg-background/80 backdrop-blur-md py-6 z-10 relative">
         <div className="container mx-auto px-4 text-center">
           <p className="font-mono text-sm text-muted-foreground">
-            <span className="text-primary">ROOT@BB_HUB</span>:~# system_status <span className="text-primary glow-text-primary">ONLINE</span>
+            <span className="text-primary">ROOT@0x41M4</span>:~# system_status <span className="text-primary glow-text-primary">ONLINE</span>
           </p>
         </div>
       </footer>

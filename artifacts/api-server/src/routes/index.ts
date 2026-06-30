@@ -9,7 +9,7 @@ import storageRouter from "./storage";
 const router: IRouter = Router();
 
 router.get("/", (_req, res) => {
-  res.json({ status: "ok", service: "cyber-report-hub-api" });
+  res.json({ status: "ok", service: "0x41m4-api" });
 });
 
 router.use(healthRouter);
