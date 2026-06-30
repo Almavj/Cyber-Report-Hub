@@ -1,0 +1,4 @@
+[build]
+  base = "artifacts/bounty-hub"
+  command = "pnpm build"
+  publish = "dist"
