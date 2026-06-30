@@ -4,11 +4,9 @@ services:
     runtime: node
     plan: starter
     buildCommand: |
-      corepack enable
-      corepack prepare pnpm@latest --activate
-      pnpm install --frozen-lockfile
-      pnpm --filter @workspace/api-server run build
-      pnpm --filter @workspace/bounty-hub run build
+      npx pnpm@latest install --frozen-lockfile
+      npx pnpm@latest --filter @workspace/api-server run build
+      npx pnpm@latest --filter @workspace/bounty-hub run build
     startCommand: node --enable-source-maps ./artifacts/api-server/dist/bootstrap.mjs
     envVars:
       - key: NODE_ENV

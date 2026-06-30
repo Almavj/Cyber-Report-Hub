@@ -51,8 +51,12 @@ app.use("/api", router);
 const frontendDist = resolve(__dirname, "../../../artifacts/bounty-hub/dist/public");
 if (existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
-  app.get("/{*path}", (_req, res) => {
-    res.sendFile(resolve(frontendDist, "index.html"));
+  app.use((req, res, next) => {
+    if (req.method === "GET" && !req.path.startsWith("/api")) {
+      res.sendFile(resolve(frontendDist, "index.html"));
+    } else {
+      next();
+    }
   });
 } else {
   app.get("/", (_req, res) => {
