@@ -32,7 +32,7 @@ export default function EditWriteup() {
   const queryClient = useQueryClient();
 
   const { data: writeup, isLoading } = useGetWriteup(id, {
-    query: { enabled: !!id }
+    query: { queryKey: getGetWriteupQueryKey(id), enabled: !!id }
   });
 
   const updateWriteup = useUpdateWriteup();

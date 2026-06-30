@@ -1,14 +1,22 @@
 import { randomUUID } from "crypto";
-import {
-  readdir,
-  stat,
-  writeFile,
-  readFile,
-  unlink,
-  mkdir,
-} from "fs/promises";
-import { join, extname } from "path";
+import { extname, basename } from "path";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { env } from "../config/env";
+
+const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  "application/pdf",
+  "text/plain",
+  "text/markdown",
+  "application/json",
+  "application/zip",
+  "application/x-tar",
+  "application/gzip",
+];
 
 export class ObjectNotFoundError extends Error {
   constructor() {
@@ -18,12 +26,12 @@ export class ObjectNotFoundError extends Error {
   }
 }
 
-function getUploadDir(): string {
-  return join(process.cwd(), env.uploadDir);
-}
-
-function getMetadataPath(filePath: string): string {
-  return `${filePath}.meta.json`;
+export class InvalidFileTypeError extends Error {
+  constructor(mimeType: string) {
+    super(`File type "${mimeType}" is not allowed`);
+    this.name = "InvalidFileTypeError";
+    Object.setPrototypeOf(this, InvalidFileTypeError.prototype);
+  }
 }
 
 export interface StoredFileMeta {
@@ -33,25 +41,53 @@ export interface StoredFileMeta {
   uploadedAt: string;
 }
 
+let supabase: SupabaseClient;
+
+function getSupabaseClient(): SupabaseClient {
+  if (!supabase) {
+    supabase = createClient(env.supabaseUrl, env.supabaseServiceRoleKey);
+  }
+  return supabase;
+}
+
+function sanitizeFileName(fileName: string): string {
+  const safe = basename(fileName).replace(/[^a-zA-Z0-9._-]/g, "_");
+  if (safe === "." || safe === ".." || safe === "") {
+    throw new ObjectNotFoundError();
+  }
+  return safe;
+}
+
 export class ObjectStorageService {
   constructor() {}
 
-  async ensureUploadDir(): Promise<void> {
-    await mkdir(getUploadDir(), { recursive: true });
-    await mkdir(join(getUploadDir(), "public"), { recursive: true });
+  static isAllowedFileType(mimeType: string): boolean {
+    return ALLOWED_MIME_TYPES.includes(mimeType);
   }
 
   async saveFile(
     file: Express.Multer.File,
   ): Promise<{ objectPath: string; meta: StoredFileMeta }> {
-    await this.ensureUploadDir();
+    if (!ObjectStorageService.isAllowedFileType(file.mimetype)) {
+      throw new InvalidFileTypeError(file.mimetype);
+    }
 
     const ext = extname(file.originalname);
     const objectId = randomUUID();
     const fileName = `${objectId}${ext}`;
-    const filePath = join(getUploadDir(), fileName);
+    const bucket = env.supabaseStorageBucket;
 
-    await writeFile(filePath, file.buffer);
+    const client = getSupabaseClient();
+    const { error } = await client.storage
+      .from(bucket)
+      .upload(fileName, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false,
+      });
+
+    if (error) {
+      throw new Error(`Failed to upload file to Supabase: ${error.message}`);
+    }
 
     const meta: StoredFileMeta = {
       originalName: file.originalname,
@@ -59,7 +95,6 @@ export class ObjectStorageService {
       size: file.size,
       uploadedAt: new Date().toISOString(),
     };
-    await writeFile(getMetadataPath(filePath), JSON.stringify(meta, null, 2));
 
     return { objectPath: `/objects/${fileName}`, meta };
   }
@@ -68,62 +103,83 @@ export class ObjectStorageService {
     if (!objectPath.startsWith("/objects/")) {
       throw new ObjectNotFoundError();
     }
-    const fileName = objectPath.slice("/objects/".length);
-    const filePath = join(getUploadDir(), fileName);
 
-    try {
-      await stat(filePath);
-    } catch {
+    const rawName = objectPath.slice("/objects/".length);
+    const fileName = sanitizeFileName(rawName);
+    const bucket = env.supabaseStorageBucket;
+    const client = getSupabaseClient();
+
+    const { data, error } = await client.storage
+      .from(bucket)
+      .createSignedUrl(fileName, 60);
+
+    if (error) {
       throw new ObjectNotFoundError();
     }
-    return filePath;
+
+    return data.signedUrl;
   }
 
   async getMetadata(filePath: string): Promise<StoredFileMeta | null> {
-    try {
-      const data = await readFile(getMetadataPath(filePath), "utf-8");
-      return JSON.parse(data);
-    } catch {
-      return null;
-    }
+    return null;
   }
 
   async searchPublicObject(
     filePath: string,
   ): Promise<{ filePath: string; meta: StoredFileMeta | null } | null> {
-    const fullPath = join(getUploadDir(), "public", filePath);
-    try {
-      await stat(fullPath);
-      const meta = await this.getMetadata(fullPath);
-      return { filePath: fullPath, meta };
-    } catch {
+    const rawName = filePath.startsWith("/objects/")
+      ? filePath.slice("/objects/".length)
+      : filePath;
+    const fileName = sanitizeFileName(rawName);
+    const bucket = env.supabaseStorageBucket;
+    const client = getSupabaseClient();
+
+    const { data, error } = await client.storage
+      .from(bucket)
+      .createSignedUrl(fileName, 60);
+
+    if (error) {
       return null;
     }
+
+    return { filePath: data.signedUrl, meta: null };
   }
 
   async listFiles(): Promise<Array<{ name: string; meta: StoredFileMeta }>> {
-    await this.ensureUploadDir();
-    const files = await readdir(getUploadDir());
-    const result: Array<{ name: string; meta: StoredFileMeta }> = [];
+    const bucket = env.supabaseStorageBucket;
+    const client = getSupabaseClient();
 
-    for (const file of files) {
-      if (file.endsWith(".meta.json")) continue;
-      const filePath = join(getUploadDir(), file);
-      const meta = await this.getMetadata(filePath);
-      if (meta) {
-        result.push({ name: file, meta });
-      }
+    const { data, error } = await client.storage.from(bucket).list("");
+
+    if (error) {
+      throw new Error(`Failed to list files from Supabase: ${error.message}`);
     }
-    return result;
+
+    return (data || []).map((file: any) => ({
+      name: file.name,
+      meta: {
+        originalName: file.name,
+        contentType: file.metadata?.mimetype || "application/octet-stream",
+        size: file.metadata?.size || 0,
+        uploadedAt: file.created_at || new Date().toISOString(),
+      },
+    }));
   }
 
   async deleteFile(objectPath: string): Promise<void> {
-    const filePath = await this.getFilePath(objectPath);
-    await unlink(filePath);
-    try {
-      await unlink(getMetadataPath(filePath));
-    } catch {
-      // metadata may not exist
+    if (!objectPath.startsWith("/objects/")) {
+      throw new ObjectNotFoundError();
+    }
+
+    const rawName = objectPath.slice("/objects/".length);
+    const fileName = sanitizeFileName(rawName);
+    const bucket = env.supabaseStorageBucket;
+    const client = getSupabaseClient();
+
+    const { error } = await client.storage.from(bucket).remove([fileName]);
+
+    if (error) {
+      throw new Error(`Failed to delete file from Supabase: ${error.message}`);
     }
   }
 }

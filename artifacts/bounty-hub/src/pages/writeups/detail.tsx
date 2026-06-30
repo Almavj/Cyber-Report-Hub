@@ -1,5 +1,5 @@
 import { AnimatedPage } from "@/components/ui/animated-page";
-import { useGetWriteup, useDeleteWriteup, useToggleWriteupFeature, getListWriteupsQueryKey } from "@workspace/api-client-react";
+import { useGetWriteup, useDeleteWriteup, useToggleWriteupFeature, getGetWriteupQueryKey, getListWriteupsQueryKey } from "@workspace/api-client-react";
 import { useRoute, useLocation, Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SeverityBadge } from "@/components/ui/severity-badge";
@@ -28,7 +28,7 @@ export default function WriteupDetail() {
   const queryClient = useQueryClient();
 
   const { data: writeup, isLoading } = useGetWriteup(id, {
-    query: { enabled: !!id }
+    query: { queryKey: getGetWriteupQueryKey(id), enabled: !!id }
   });
 
   const deleteWriteup = useDeleteWriteup();

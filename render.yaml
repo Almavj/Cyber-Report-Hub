@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: cyber-report-hub
+    runtime: node
+    plan: starter
+    buildCommand: |
+      corepack enable
+      corepack prepare pnpm@latest --activate
+      pnpm install --frozen-lockfile
+      pnpm --filter @workspace/api-server run build
+      pnpm --filter @workspace/bounty-hub run build
+    startCommand: node --enable-source-maps ./artifacts/api-server/dist/bootstrap.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: cyber-report-hub
+      - key: ALLOWED_ORIGINS
+        sync: false
+    healthCheckPath: /api/healthz

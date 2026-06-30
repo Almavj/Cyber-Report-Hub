@@ -1,6 +1,10 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import multer from "multer";
-import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
+import {
+  ObjectStorageService,
+  ObjectNotFoundError,
+  InvalidFileTypeError,
+} from "../lib/objectStorage";
 
 const router: IRouter = Router();
 const objectStorageService = new ObjectStorageService();
@@ -8,47 +12,83 @@ const objectStorageService = new ObjectStorageService();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (ObjectStorageService.isAllowedFileType(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new InvalidFileTypeError(file.mimetype));
+    }
+  },
 });
 
-/**
- * POST /uploads
- * Upload a file via multipart/form-data. Field name: "file"
- */
-router.post("/uploads", upload.single("file"), async (req: Request, res: Response) => {
-  try {
-    const file = req.file;
-    if (!file) {
-      res.status(400).json({ error: "No file provided" });
+const uploadLimiter = (() => {
+  const hits = new Map<string, { count: number; resetAt: number }>();
+  const WINDOW_MS = 60_000;
+  const MAX_REQUESTS = 10;
+
+  return (req: Request, res: Response, next: Function) => {
+    const ip = req.ip || req.socket.remoteAddress || "unknown";
+    const now = Date.now();
+    const entry = hits.get(ip);
+
+    if (!entry || now > entry.resetAt) {
+      hits.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+      return next();
+    }
+
+    entry.count++;
+    if (entry.count > MAX_REQUESTS) {
+      res.setHeader("Retry-After", String(Math.ceil((entry.resetAt - now) / 1000)));
+      res.status(429).json({ error: "Too many upload requests. Try again later." });
       return;
     }
 
-    const { objectPath, meta } = await objectStorageService.saveFile(file);
-    res.json({ objectPath, metadata: meta });
-  } catch (error) {
-    req.log.error({ err: error }, "Error uploading file");
-    res.status(500).json({ error: "Failed to upload file" });
-  }
-});
+    next();
+  };
+})();
 
-/**
- * GET /objects/:fileName
- * Serve an uploaded file by its file name.
- */
+function requireAuth(req: Request, res: Response, next: Function) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).json({ error: "Authorization required" });
+    return;
+  }
+  next();
+}
+
+router.post(
+  "/uploads",
+  requireAuth,
+  uploadLimiter,
+  upload.single("file"),
+  async (req: Request, res: Response) => {
+    try {
+      const file = req.file;
+      if (!file) {
+        res.status(400).json({ error: "No file provided" });
+        return;
+      }
+
+      const { objectPath, meta } = await objectStorageService.saveFile(file);
+      res.json({ objectPath, metadata: meta });
+    } catch (error) {
+      if (error instanceof InvalidFileTypeError) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      req.log.error({ err: error }, "Error uploading file");
+      res.status(500).json({ error: "Failed to upload file" });
+    }
+  },
+);
+
 router.get("/objects/:fileName", async (req: Request, res: Response) => {
   try {
     const fileName = req.params.fileName;
     const objectPath = `/objects/${fileName}`;
-    const filePath = await objectStorageService.getFilePath(objectPath);
-    const meta = await objectStorageService.getMetadata(filePath);
+    const signedUrl = await objectStorageService.getFilePath(objectPath);
 
-    const contentType = meta?.contentType || "application/octet-stream";
-    res.setHeader("Content-Type", contentType);
-    res.setHeader("Cache-Control", "private, max-age=3600");
-    if (meta?.size) {
-      res.setHeader("Content-Length", String(meta.size));
-    }
-
-    res.sendFile(filePath);
+    res.redirect(signedUrl);
   } catch (error) {
     if (error instanceof ObjectNotFoundError) {
       res.status(404).json({ error: "Object not found" });
@@ -59,11 +99,7 @@ router.get("/objects/:fileName", async (req: Request, res: Response) => {
   }
 });
 
-/**
- * DELETE /objects/:fileName
- * Delete an uploaded file.
- */
-router.delete("/objects/:fileName", async (req: Request, res: Response) => {
+router.delete("/objects/:fileName", requireAuth, async (req: Request, res: Response) => {
   try {
     const fileName = req.params.fileName;
     await objectStorageService.deleteFile(`/objects/${fileName}`);
@@ -78,11 +114,7 @@ router.delete("/objects/:fileName", async (req: Request, res: Response) => {
   }
 });
 
-/**
- * GET /files
- * List all uploaded files.
- */
-router.get("/files", async (_req: Request, res: Response) => {
+router.get("/files", requireAuth, async (_req: Request, res: Response) => {
   try {
     const files = await objectStorageService.listFiles();
     res.json(files);

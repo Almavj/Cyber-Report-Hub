@@ -1,5 +1,5 @@
 import { AnimatedPage } from "@/components/ui/animated-page";
-import { useGetReport, useDeleteReport, getListReportsQueryKey } from "@workspace/api-client-react";
+import { useGetReport, useDeleteReport, getGetReportQueryKey, getListReportsQueryKey } from "@workspace/api-client-react";
 import { useRoute, useLocation, Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SeverityBadge } from "@/components/ui/severity-badge";
@@ -29,7 +29,7 @@ export default function ReportDetail() {
   const queryClient = useQueryClient();
 
   const { data: report, isLoading } = useGetReport(id, {
-    query: { enabled: !!id }
+    query: { queryKey: getGetReportQueryKey(id), enabled: !!id }
   });
 
   const deleteReport = useDeleteReport();

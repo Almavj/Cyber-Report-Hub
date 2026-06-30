@@ -34,7 +34,7 @@ export default function EditReport() {
   const queryClient = useQueryClient();
 
   const { data: report, isLoading } = useGetReport(id, {
-    query: { enabled: !!id }
+    query: { queryKey: getGetReportQueryKey(id), enabled: !!id }
   });
 
   const updateReport = useUpdateReport();
