@@ -13,6 +13,7 @@ import { format } from "date-fns";
 export default function WriteupsList() {
   const [search, setSearch] = useState("");
   const { data: writeups, isLoading } = useListWriteups({ search: search || undefined });
+  const writeupsList = Array.isArray(writeups) ? writeups : [];
 
   return (
     <AnimatedPage className="space-y-6">
@@ -38,12 +39,12 @@ export default function WriteupsList() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
           Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-48 w-full" />)
-        ) : writeups?.length === 0 ? (
+        ) : writeupsList.length === 0 ? (
           <div className="col-span-full py-12 text-center border border-dashed border-border/50 font-mono text-muted-foreground">
             No writeups found.
           </div>
         ) : (
-          writeups?.map((writeup) => (
+          writeupsList.map((writeup) => (
             <Link key={writeup.id} href={`/writeups/${writeup.id}`}>
               <Card className="h-full bg-background/30 hover:bg-background/60 border-border/50 hover:border-primary/50 transition-all cursor-pointer group flex flex-col">
                 <CardContent className="p-5 flex-1 flex flex-col">

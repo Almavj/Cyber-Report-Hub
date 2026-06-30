@@ -14,6 +14,9 @@ export default function Home() {
   const { data: activity, isLoading: activityLoading } = useGetRecentActivity();
   const { data: featuredWriteups, isLoading: writeupsLoading } = useListWriteups({ featured: true });
 
+  const activityList = Array.isArray(activity) ? activity : [];
+  const featuredWriteupsList = Array.isArray(featuredWriteups) ? featuredWriteups : [];
+
   return (
     <AnimatedPage>
       <div className="relative min-h-[70vh] flex flex-col items-center justify-center text-center -mx-4 -mt-8 mb-12 px-4 py-20 overflow-hidden border-b border-border/50 bg-background/50">
@@ -98,10 +101,10 @@ export default function Home() {
           <div className="space-y-4">
             {writeupsLoading ? (
               Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32 w-full" />)
-            ) : featuredWriteups?.length === 0 ? (
+            ) : featuredWriteupsList.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground font-mono border border-dashed border-border/50">No featured writeups.</div>
             ) : (
-              featuredWriteups?.map(writeup => (
+              featuredWriteupsList.map(writeup => (
                 <Link key={writeup.id} href={`/writeups/${writeup.id}`}>
                   <Card className="group cursor-pointer bg-background/30 hover:bg-background/60 border-border/30 hover:border-primary/50 transition-all">
                     <CardContent className="p-4 flex flex-col gap-2">
@@ -135,10 +138,10 @@ export default function Home() {
             <div className="space-y-4 relative">
               {activityLoading ? (
                 Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)
-              ) : activity?.length === 0 ? (
+              ) : activityList.length === 0 ? (
                 <div className="text-muted-foreground">No recent activity.</div>
               ) : (
-                activity?.map((item, i) => (
+                activityList.map((item, i) => (
                   <div key={item.id} className="flex gap-4 items-start">
                     <div className="mt-1 w-2 h-2 rounded-full bg-primary glow-green z-10 shrink-0" />
                     <div className="flex-1">

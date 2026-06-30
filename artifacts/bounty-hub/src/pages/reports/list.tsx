@@ -14,6 +14,7 @@ import { format } from "date-fns";
 export default function ReportsList() {
   const [search, setSearch] = useState("");
   const { data: reports, isLoading } = useListReports({ search: search || undefined });
+  const reportsList = Array.isArray(reports) ? reports : [];
 
   return (
     <AnimatedPage className="space-y-6">
@@ -39,12 +40,12 @@ export default function ReportsList() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {isLoading ? (
           Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-32 w-full" />)
-        ) : reports?.length === 0 ? (
+        ) : reportsList.length === 0 ? (
           <div className="col-span-full py-12 text-center border border-dashed border-border/50 font-mono text-muted-foreground">
             No reports found.
           </div>
         ) : (
-          reports?.map((report) => (
+          reportsList.map((report) => (
             <Link key={report.id} href={`/reports/${report.id}`}>
               <Card className="h-full bg-background/30 hover:bg-background/60 border-border/50 hover:border-cyan-500/50 transition-all cursor-pointer group">
                 <CardContent className="p-4 flex flex-col gap-3">
